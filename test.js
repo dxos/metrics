@@ -33,9 +33,9 @@ test('Basics', async () => {
 
   {
     const demo = new Demo();
-    const period = Metrics.start('foo.event');
+    const period = Metrics.start('foo.event', { foo: 100 });
     await demo.test();
-    period.end();
+    period.end({ bar: 200 });
   }
 
   log(JSON.stringify(Metrics.stats, undefined, 2));
@@ -52,6 +52,16 @@ test('Counters', async () => {
   Metrics.dec('foo');
 
   expect(Metrics.stats['foo']).toEqual(1);
+});
+
+test('Values', async () => {
+  Metrics.reset();
+
+  Metrics.set('foo', 100);
+  Metrics.set('foo', 101);
+
+  expect(Metrics.stats['foo']).toEqual(101);
+  expect(Metrics.filter({ key: 'foo' })).toHaveLength(2);
 });
 
 test('Time-series', async () => {

@@ -35,6 +35,10 @@ export class Stats {
     return this;
   }
 
+  set(key, value) {
+    set(this._stats, key, value);
+  }
+
   push(key, value) {
     const values = get(this._stats, key, []);
     set(this._stats, key, [...values, value]);
@@ -43,6 +47,7 @@ export class Stats {
 
 const TYPE_INC = 'inc';
 const TYPE_DEC = 'dec';
+const TYPE_SET = 'set';
 const TYPE_PERIOD = 'period';
 
 /**
@@ -52,6 +57,7 @@ export class Metrics extends EventEmitter {
 
   static root = new Metrics();
 
+  // Ordered list of metrics.
   _metrics = [];
 
   constructor(name, parent) {
@@ -62,6 +68,7 @@ export class Metrics extends EventEmitter {
   }
 
   reset() {
+    this._metrics = [];
     this._stats.reset();
   }
 
@@ -70,24 +77,28 @@ export class Metrics extends EventEmitter {
     return new Metrics(name, this);
   }
 
+  //
   // Getters
+  //
 
   get stats() {
     return this._stats.stats;
   }
 
   /**
-   * Filter by object properties.
+   * Filters the metrics log by object properties.
    * @param {Object} object
    */
   filter(object) {
     return filter(this._metrics, matches(object));
   }
 
+  //
   // Setters
+  //
 
   /**
-   * Increment the named counter.
+   * Increments the named counter.
    * @param {string} key
    */
   inc(key) {
@@ -95,7 +106,7 @@ export class Metrics extends EventEmitter {
   }
 
   /**
-   * Deccrement the named counter.
+   * Deccrements the named counter.
    * @param {string} key
    */
   dec(key) {
@@ -103,23 +114,41 @@ export class Metrics extends EventEmitter {
   }
 
   /**
-   * Create a named timer.
+   * Sets the value of the given key.
    * @param {string} key
+   * @param {*} value
+   */
+  set(key, value) {
+    this._log({ type: TYPE_SET, name: this._name, key, value });
+  }
+
+  /**
+   * Creates a named timer.
+   * @param {string} key
+   * @param {Object} [customStart] Custom attributes for event.
    * @returns {{start: number, end: Function}}
    */
-  start(key) {
+  start(key, customStart) {
     const start = Date.now();
     return {
       start,
-      end: () => {
+      end: (customEnd) => {
         const end = Date.now();
+        const custom = (customStart || customEnd) && {
+          custom: {
+            ...customStart,
+            ...customEnd
+          }
+        };
+
         this._log({
           type: TYPE_PERIOD,
           name: this._name,
           key,
           start,
           end,
-          period: end - start
+          period: end - start,
+          ...custom
         });
       }
     }
@@ -140,8 +169,14 @@ export class Metrics extends EventEmitter {
         break;
       }
 
+      case TYPE_SET: {
+        this._stats.set(key, metric.value);
+        break;
+      }
+
       case TYPE_PERIOD: {
-        this._stats.push(key, metric);
+        const { start, end, period, custom } = metric;
+        this._stats.push(key, { start, end, period, custom });
         break;
       }
 
