@@ -24,7 +24,7 @@ test('Basics', async () => {
 
   {
     const demo = new Demo();
-    const period = Metrics.start('foo.period');
+    const period = Metrics.start('foo.event');
     await demo.test();
     await demo.test();
     await demo.test();
@@ -33,27 +33,28 @@ test('Basics', async () => {
 
   {
     const demo = new Demo();
-    const period = Metrics.start('foo.period');
+    const period = Metrics.start('foo.event');
     await demo.test();
     period.end();
   }
 
   log(JSON.stringify(Metrics.stats, undefined, 2));
-  log(Metrics.filter({ type: 'inc' }));
-  log(Metrics.filter({ key: 'foo.test' }));
+
+  expect(Metrics.filter({ type: 'inc' })).toHaveLength(4);
+  expect(Metrics.filter({ key: 'foo.test' })).toHaveLength(4);
 });
 
-test('counter', async () => {
+test('Counters', async () => {
   Metrics.reset();
 
   Metrics.inc('foo');
   Metrics.inc('foo');
-  Metrics.inc('foo');
+  Metrics.dec('foo');
 
-  expect(Metrics.stats['foo']).toEqual(Metrics.filter({ key: 'foo' }).length);
+  expect(Metrics.stats['foo']).toEqual(1);
 });
 
-test('time-series', async () => {
+test('Time-series', async () => {
   Metrics.reset();
 
   const work = async () => {

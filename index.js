@@ -29,14 +29,21 @@ export class Stats {
     return this;
   }
 
+  dec(key) {
+    const value = get(this._stats, key, 0);
+    set(this._stats, key, value - 1);
+    return this;
+  }
+
   push(key, value) {
     const values = get(this._stats, key, []);
     set(this._stats, key, [...values, value]);
   }
 }
 
-const TYPE_INC = 1;
-const TYPE_PERIOD = 2;
+const TYPE_INC = 'inc';
+const TYPE_DEC = 'dec';
+const TYPE_PERIOD = 'period';
 
 /**
  * Hierarchical metrics gatherer.
@@ -88,6 +95,14 @@ export class Metrics extends EventEmitter {
   }
 
   /**
+   * Deccrement the named counter.
+   * @param {string} key
+   */
+  dec(key) {
+    this._log({ type: TYPE_DEC, name: this._name, key, ts: Date.now() });
+  }
+
+  /**
    * Create a named timer.
    * @param {string} key
    * @returns {{start: number, end: Function}}
@@ -117,6 +132,11 @@ export class Metrics extends EventEmitter {
     switch (type) {
       case TYPE_INC: {
         this._stats.inc(key);
+        break;
+      }
+
+      case TYPE_DEC: {
+        this._stats.dec(key);
         break;
       }
 
