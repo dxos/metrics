@@ -24,18 +24,18 @@ test('Basics', async () => {
 
   {
     const demo = new Demo();
-    const period = Metrics.start('foo.event');
+    const timer = Metrics.start('foo.event');
     await demo.test();
     await demo.test();
     await demo.test();
-    period.end();
+    timer.end();
   }
 
   {
     const demo = new Demo();
-    const period = Metrics.start('foo.event', { foo: 100 });
+    const timer = Metrics.start('foo.event', { foo: 100 });
     await demo.test();
-    period.end({ bar: 200 });
+    timer.end({ bar: 200 });
   }
 
   log(JSON.stringify(Metrics.stats, undefined, 2));
@@ -67,12 +67,17 @@ test('Values', async () => {
 test('Time-series', async () => {
   Metrics.reset();
 
-  const work = async () => {
-    const period = Metrics.start('bar');
+  const work = async (i) => {
+    const timer = Metrics.start('work');
     await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
-    period.end();
+    timer.end({ i });
   };
 
-  await work();
-  expect(Metrics.stats['bar'][0].period).not.toBe(0);
+  for (let i = 0; i < 5; i++) {
+    await work(i);
+  }
+
+  log(JSON.stringify(Metrics.stats, undefined, 2));
+
+  expect(Metrics.stats['work'][0].period).not.toBe(0);
 });

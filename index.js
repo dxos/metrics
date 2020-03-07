@@ -176,7 +176,7 @@ export class Metrics extends EventEmitter {
 
       case TYPE_PERIOD: {
         const { start, end, period, custom } = metric;
-        this._stats.push(key, { start, end, period, custom });
+        this._stats.push(key, { start, end, period, ...custom && { custom } });
         break;
       }
 
