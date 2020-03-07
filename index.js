@@ -2,11 +2,18 @@
 // Copyright 2020 DxOS.
 //
 
+import assert from 'assert';
 import EventEmitter from 'events';
 import filter from 'lodash.filter';
 import get from 'lodash.get';
 import matches from 'lodash.matches';
 import set from 'lodash.set';
+
+function typename(obj) {
+  return typeof obj === 'string' ? obj :
+    typeof obj === 'function' ? `type:${obj.name}` :
+      `type:${obj.constructor.name}`;
+}
 
 /**
  * Aggregated values.
@@ -72,9 +79,14 @@ export class Metrics extends EventEmitter {
     this._stats.reset();
   }
 
+  /**
+   * Creates a new metrics gatherer.
+   * @param {Object|string} obj Either the owning instance or a given name for the gatherer.
+   * @returns {Metrics}
+   */
   register(obj) {
-    const name = typeof obj === 'string' ? obj : obj.constructor.name;
-    return new Metrics(name, this);
+    assert(obj);
+    return new Metrics(typename(obj), this);
   }
 
   //
@@ -87,9 +99,13 @@ export class Metrics extends EventEmitter {
 
   /**
    * Filters the metrics log by object properties.
-   * @param {Object} object
+   * @param {Object} [object] Filter by properties (or return all if undefined).
    */
   filter(object) {
+    if (object && object.source) {
+      object.source = typename(object.source);
+    }
+
     return filter(this._metrics, matches(object));
   }
 

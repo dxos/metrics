@@ -13,7 +13,7 @@ class Demo {
   _metrics = Metrics.register(this);
 
   async test() {
-    await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
+    await new Promise((resolve) => setTimeout(resolve, 10 + Math.random() * 100));
     this._metrics.inc('foo.test');
     return this;
   }
@@ -40,6 +40,9 @@ test('Basics', async () => {
 
   log(JSON.stringify(Metrics.stats, undefined, 2));
 
+  console.log(Metrics.filter());
+
+  expect(Metrics.filter({ source: Demo })).toHaveLength(4);
   expect(Metrics.filter({ type: 'inc' })).toHaveLength(4);
   expect(Metrics.filter({ key: 'foo.test' })).toHaveLength(4);
 });
