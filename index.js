@@ -102,7 +102,7 @@ export class Metrics extends EventEmitter {
    * @param {string} key
    */
   inc(key) {
-    this._log({ type: TYPE_INC, name: this._name, key, ts: Date.now() });
+    this._log({ type: TYPE_INC, source: this._name, key, ts: Date.now() });
   }
 
   /**
@@ -110,7 +110,7 @@ export class Metrics extends EventEmitter {
    * @param {string} key
    */
   dec(key) {
-    this._log({ type: TYPE_DEC, name: this._name, key, ts: Date.now() });
+    this._log({ type: TYPE_DEC, source: this._name, key, ts: Date.now() });
   }
 
   /**
@@ -119,7 +119,7 @@ export class Metrics extends EventEmitter {
    * @param {*} value
    */
   set(key, value) {
-    this._log({ type: TYPE_SET, name: this._name, key, value });
+    this._log({ type: TYPE_SET, source: this._name, key, ts: Date.now(), value });
   }
 
   /**
@@ -134,21 +134,13 @@ export class Metrics extends EventEmitter {
       start,
       end: (customEnd) => {
         const end = Date.now();
-        const custom = (customStart || customEnd) && {
-          custom: {
-            ...customStart,
-            ...customEnd
-          }
-        };
-
         this._log({
           type: TYPE_PERIOD,
-          name: this._name,
+          source: this._name,
           key,
-          start,
-          end,
+          ts: start,
           period: end - start,
-          ...custom
+          ...(customStart || customEnd) && { custom: { ...customStart, ...customEnd } }
         });
       }
     }
@@ -175,8 +167,8 @@ export class Metrics extends EventEmitter {
       }
 
       case TYPE_PERIOD: {
-        const { start, end, period, custom } = metric;
-        this._stats.push(key, { start, end, period, ...custom && { custom } });
+        const { ts, period, custom } = metric;
+        this._stats.push(key, { ts, period, ...custom && { custom } });
         break;
       }
 
