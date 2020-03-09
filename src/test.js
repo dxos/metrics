@@ -7,12 +7,11 @@ import debug from 'debug';
 import metrics from './index';
 
 const log = debug('test');
-debug.enable('*');
 
 class Demo {
   _metrics = metrics.register(this);
 
-  async test() {
+  async test () {
     await new Promise((resolve) => setTimeout(resolve, 10 + Math.random() * 100));
     this._metrics.inc('foo.test');
     return this;
@@ -39,8 +38,7 @@ test('Basics', async () => {
   }
 
   log(JSON.stringify(metrics.stats, undefined, 2));
-
-  console.log(metrics.filter());
+  log(metrics.filter());
 
   expect(metrics.filter({ source: Demo })).toHaveLength(4);
   expect(metrics.filter({ type: 'inc' })).toHaveLength(4);
@@ -54,7 +52,7 @@ test('Counters', async () => {
   metrics.inc('foo');
   metrics.dec('foo');
 
-  expect(metrics.stats['foo']).toEqual(1);
+  expect(metrics.stats.foo).toEqual(1);
 });
 
 test('Values', async () => {
@@ -63,7 +61,7 @@ test('Values', async () => {
   metrics.set('foo', 100);
   metrics.set('foo', 101);
 
-  expect(metrics.stats['foo']).toEqual(101);
+  expect(metrics.stats.foo).toEqual(101);
   expect(metrics.filter({ key: 'foo' })).toHaveLength(2);
 });
 
@@ -82,5 +80,5 @@ test('Time-series', async () => {
 
   log(JSON.stringify(metrics.stats, undefined, 2));
 
-  expect(metrics.stats['work'][0].period).not.toBe(0);
+  expect(metrics.stats.work[0].period).not.toBe(0);
 });

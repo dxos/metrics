@@ -1,21 +1,35 @@
 {
   "name": "metrics",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.0",
   "description": "Non-intrusive metrics gathering.",
-  "main": "index.js",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/es/index.js",
   "scripts": {
-    "test": "jest"
+    "build": "babel ./src --out-dir ./dist/es --ignore \"**/*.test.js\" --source-maps inline",
+    "build:watch": "yarn run build --watch",
+    "clean": "rm -rf ./dist",
+    "coverage": "npm test -- --coverage --coverageDirectory ./out",
+    "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls",
+    "lint": "semistandard './src/**/*.js'",
+    "prepublishOnly": "npm run test && npm run build",
+    "test": "jest --rootDir=./src --verbose --passWithNoTests",
+    "posttest": "npm run lint"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dxos/metrics.git"
   },
   "author": "",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/dxos/metrics/issues"
   },
   "homepage": "https://github.com/dxos/metrics#readme",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "dependencies": {
     "@babel/runtime": "^7.8.7",
     "debug": "^4.1.1",
@@ -31,9 +45,23 @@
     "@babel/plugin-proposal-export-default-from": "^7.2.0",
     "@babel/plugin-transform-runtime": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
+    "babel-eslint": "^10.0.2",
     "babel-jest": "^24.8.0",
     "babel-loader": "^8.0.0",
     "babel-plugin-add-module-exports": "^1.0.0",
-    "jest": "^25.1.0"
+    "coveralls": "^3.0.7",
+    "jest": "^24.5.0",
+    "semistandard": "14.2.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "semistandard": {
+    "parser": "babel-eslint",
+    "env": [
+      "jest",
+      "node",
+      "browser"
+    ]
   }
 }

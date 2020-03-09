@@ -9,44 +9,43 @@ import get from 'lodash.get';
 import matches from 'lodash.matches';
 import set from 'lodash.set';
 
-function typename(obj) {
-  return typeof obj === 'string' ? obj :
-    typeof obj === 'function' ? `type:${obj.name}` :
-      `type:${obj.constructor.name}`;
+function typename (obj) {
+  return typeof obj === 'string' ? obj
+    : typeof obj === 'function' ? `type:${obj.name}`
+      : `type:${obj.constructor.name}`;
 }
 
 /**
  * Aggregated values.
  */
 export class Stats {
-
   _stats = {};
 
-  get stats() {
+  get stats () {
     return this._stats;
   }
 
-  reset() {
+  reset () {
     this._stats = {};
   }
 
-  inc(key) {
+  inc (key) {
     const value = get(this._stats, key, 0);
     set(this._stats, key, value + 1);
     return this;
   }
 
-  dec(key) {
+  dec (key) {
     const value = get(this._stats, key, 0);
     set(this._stats, key, value - 1);
     return this;
   }
 
-  set(key, value) {
+  set (key, value) {
     set(this._stats, key, value);
   }
 
-  push(key, value) {
+  push (key, value) {
     const values = get(this._stats, key, []);
     set(this._stats, key, [...values, value]);
   }
@@ -61,20 +60,19 @@ const TYPE_PERIOD = 'period';
  * Hierarchical metrics gatherer.
  */
 export class Metrics extends EventEmitter {
-
   static root = new Metrics();
 
   // Ordered list of metrics.
   _metrics = [];
 
-  constructor(name, parent) {
+  constructor (name, parent) {
     super();
     this._name = name;
     this._parent = parent;
     this._stats = new Stats();
   }
 
-  reset() {
+  reset () {
     this._metrics = [];
     this._stats.reset();
   }
@@ -84,7 +82,7 @@ export class Metrics extends EventEmitter {
    * @param {Object|string} obj Either the owning instance or a given name for the gatherer.
    * @returns {Metrics}
    */
-  register(obj) {
+  register (obj) {
     assert(obj);
     return new Metrics(typename(obj), this);
   }
@@ -93,7 +91,7 @@ export class Metrics extends EventEmitter {
   // Getters
   //
 
-  get stats() {
+  get stats () {
     return this._stats.stats;
   }
 
@@ -101,7 +99,7 @@ export class Metrics extends EventEmitter {
    * Filters the metrics log by object properties.
    * @param {Object} [object] Filter by properties (or return all if undefined).
    */
-  filter(object) {
+  filter (object) {
     if (object && object.source) {
       object.source = typename(object.source);
     }
@@ -117,7 +115,7 @@ export class Metrics extends EventEmitter {
    * Increments the named counter.
    * @param {string} key
    */
-  inc(key) {
+  inc (key) {
     this._log({ type: TYPE_INC, source: this._name, key, ts: Date.now() });
   }
 
@@ -125,7 +123,7 @@ export class Metrics extends EventEmitter {
    * Deccrements the named counter.
    * @param {string} key
    */
-  dec(key) {
+  dec (key) {
     this._log({ type: TYPE_DEC, source: this._name, key, ts: Date.now() });
   }
 
@@ -134,7 +132,7 @@ export class Metrics extends EventEmitter {
    * @param {string} key
    * @param {*} value
    */
-  set(key, value) {
+  set (key, value) {
     this._log({ type: TYPE_SET, source: this._name, key, ts: Date.now(), value });
   }
 
@@ -144,7 +142,7 @@ export class Metrics extends EventEmitter {
    * @param {Object} [customStart] Custom attributes for event.
    * @returns {{start: number, end: Function}}
    */
-  start(key, customStart) {
+  start (key, customStart) {
     const start = Date.now();
     return {
       start,
@@ -159,10 +157,10 @@ export class Metrics extends EventEmitter {
           ...(customStart || customEnd) && { custom: { ...customStart, ...customEnd } }
         });
       }
-    }
+    };
   }
 
-  _log(metric) {
+  _log (metric) {
     this._metrics.push(metric);
 
     const { type, key } = metric;
@@ -189,7 +187,7 @@ export class Metrics extends EventEmitter {
       }
 
       default:
-        throw new Error(`Unknown type: ${type}`);
+        throw new Error('Unknown type:', type);
     }
 
     this.emit('update', this.stats);
