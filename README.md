@@ -13,18 +13,18 @@ $ npm install @dxos/metrics
 Metrics can either be submitted to the root object:
 
 ```javascript
-import Metrics from '@dxos/metrics';
+import metrics from '@dxos/metrics';
 
-Metrics.inc('work.started');
+metrics.inc('work.started');
 ```
 
 or to a nested object:
 
 ```javascript
-import Metrics from '@dxos/metrics';
+import metrics from '@dxos/metrics';
 
 class Test {
-  _metrics = Metrics.register(this);
+  _metrics = metrics(Test);
 
   work() {
     this._metrics.inc('work.started');
@@ -35,7 +35,7 @@ class Test {
 Nested Metrics objects are scoped and allow for filtering. 
 
 ```javascript
-Metrics.filter({ source: Test, key: 'work.started' });
+metrics.filter({ source: Test, key: 'work.started' });
 ```
 
 All metrics are passed up to successive Metrics objects.
@@ -43,22 +43,22 @@ All metrics are passed up to successive Metrics objects.
 ### Counters
 
 ```javascript
-import Metrics from '@dxos/metrics';
+import metrics from '@dxos/metrics';
 
-Metrics.inc('counter');
-Metrics.inc('counter');
-Metrics.inc('counter');
+metrics.inc('counter');
+metrics.inc('counter');
+metrics.inc('counter');
 
-expect(Metrics.stats['counter']).toEqual(Metrics.filter({ key: 'counter' }).length);
+expect(metrics.stats['counter']).toEqual(metrics.filter({ key: 'counter' }).length);
 ```
 
 ### Time Series
 
 ```javascript
-import Metrics from '@dxos/metrics';
+import metrics from '@dxos/metrics';
 
 const work = async () => {
-  const period = Metrics.start('work');
+  const period = metrics.start('work');
   await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
   period.end();
 };
