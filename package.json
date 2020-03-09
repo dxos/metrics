@@ -1,0 +1,39 @@
+{
+  "name": "metrics",
+  "version": "1.0.0",
+  "description": "Non-intrusive metrics gathering.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dxos/metrics.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dxos/metrics/issues"
+  },
+  "homepage": "https://github.com/dxos/metrics#readme",
+  "dependencies": {
+    "@babel/runtime": "^7.8.7",
+    "debug": "^4.1.1",
+    "lodash.filter": "^4.6.0",
+    "lodash.get": "^4.4.2",
+    "lodash.matches": "^4.6.0",
+    "lodash.set": "^4.3.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.3.0",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.0",
+    "babel-plugin-add-module-exports": "^1.0.0",
+    "jest": "^25.1.0"
+  }
+}
