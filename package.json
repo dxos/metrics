@@ -19,7 +19,6 @@
   "dependencies": {
     "@babel/runtime": "^7.8.7",
     "debug": "^4.1.1",
-    "jest": "^25.1.0",
     "lodash.filter": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.matches": "^4.6.0",
@@ -34,6 +33,7 @@
     "@babel/preset-env": "^7.0.0",
     "babel-jest": "^24.8.0",
     "babel-loader": "^8.0.0",
-    "babel-plugin-add-module-exports": "^1.0.0"
+    "babel-plugin-add-module-exports": "^1.0.0",
+    "jest": "^25.1.0"
   }
 }

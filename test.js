@@ -4,13 +4,13 @@
 
 import debug from 'debug';
 
-import Metrics from './index';
+import metrics from './index';
 
 const log = debug('test');
 debug.enable('*');
 
 class Demo {
-  _metrics = Metrics.register(this);
+  _metrics = metrics.register(this);
 
   async test() {
     await new Promise((resolve) => setTimeout(resolve, 10 + Math.random() * 100));
@@ -20,11 +20,11 @@ class Demo {
 }
 
 test('Basics', async () => {
-  Metrics.reset();
+  metrics.reset();
 
   {
     const demo = new Demo();
-    const timer = Metrics.start('foo.event');
+    const timer = metrics.start('foo.event');
     await demo.test();
     await demo.test();
     await demo.test();
@@ -33,45 +33,45 @@ test('Basics', async () => {
 
   {
     const demo = new Demo();
-    const timer = Metrics.start('foo.event', { foo: 100 });
+    const timer = metrics.start('foo.event', { foo: 100 });
     await demo.test();
     timer.end({ bar: 200 });
   }
 
-  log(JSON.stringify(Metrics.stats, undefined, 2));
+  log(JSON.stringify(metrics.stats, undefined, 2));
 
-  console.log(Metrics.filter());
+  console.log(metrics.filter());
 
-  expect(Metrics.filter({ source: Demo })).toHaveLength(4);
-  expect(Metrics.filter({ type: 'inc' })).toHaveLength(4);
-  expect(Metrics.filter({ key: 'foo.test' })).toHaveLength(4);
+  expect(metrics.filter({ source: Demo })).toHaveLength(4);
+  expect(metrics.filter({ type: 'inc' })).toHaveLength(4);
+  expect(metrics.filter({ key: 'foo.test' })).toHaveLength(4);
 });
 
 test('Counters', async () => {
-  Metrics.reset();
+  metrics.reset();
 
-  Metrics.inc('foo');
-  Metrics.inc('foo');
-  Metrics.dec('foo');
+  metrics.inc('foo');
+  metrics.inc('foo');
+  metrics.dec('foo');
 
-  expect(Metrics.stats['foo']).toEqual(1);
+  expect(metrics.stats['foo']).toEqual(1);
 });
 
 test('Values', async () => {
-  Metrics.reset();
+  metrics.reset();
 
-  Metrics.set('foo', 100);
-  Metrics.set('foo', 101);
+  metrics.set('foo', 100);
+  metrics.set('foo', 101);
 
-  expect(Metrics.stats['foo']).toEqual(101);
-  expect(Metrics.filter({ key: 'foo' })).toHaveLength(2);
+  expect(metrics.stats['foo']).toEqual(101);
+  expect(metrics.filter({ key: 'foo' })).toHaveLength(2);
 });
 
 test('Time-series', async () => {
-  Metrics.reset();
+  metrics.reset();
 
   const work = async (i) => {
-    const timer = Metrics.start('work');
+    const timer = metrics.start('work');
     await new Promise((resolve) => setTimeout(resolve, Math.random() * 100));
     timer.end({ i });
   };
@@ -80,7 +80,7 @@ test('Time-series', async () => {
     await work(i);
   }
 
-  log(JSON.stringify(Metrics.stats, undefined, 2));
+  log(JSON.stringify(metrics.stats, undefined, 2));
 
-  expect(Metrics.stats['work'][0].period).not.toBe(0);
+  expect(metrics.stats['work'][0].period).not.toBe(0);
 });
