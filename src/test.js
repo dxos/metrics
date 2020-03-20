@@ -4,7 +4,7 @@
 
 import debug from 'debug';
 
-import metrics, { Metrics } from './index';
+import metrics, { Metrics } from './metrics';
 
 const log = debug('test');
 
@@ -42,7 +42,7 @@ test('Basics', async () => {
     timer.end({ bar: 200 });
   }
 
-  log(JSON.stringify(metrics.stats, undefined, 2));
+  log(JSON.stringify(metrics.values, undefined, 2));
   log(metrics.tags);
 
   expect(metrics.filter({ source: Demo })).toHaveLength(4);
@@ -60,7 +60,7 @@ test('Counters', async () => {
   m.inc('foo');
   m.dec('foo');
 
-  expect(m.stats.foo).toEqual(1);
+  expect(m.values.foo).toEqual(1);
 });
 
 test('Values', async () => {
@@ -69,7 +69,7 @@ test('Values', async () => {
   m.set('foo', 100);
   m.set('foo', 101);
 
-  expect(m.stats.foo).toEqual(101);
+  expect(m.values.foo).toEqual(101);
   expect(m.filter({ key: 'foo' })).toHaveLength(2);
 });
 
@@ -86,7 +86,7 @@ test('Time-series', async () => {
     await work(i);
   }
 
-  log(JSON.stringify(m.stats, undefined, 2));
+  log(JSON.stringify(m.values, undefined, 2));
 
-  expect(m.stats.work[0].period).not.toBe(0);
+  expect(m.values.work[0].period).not.toBe(0);
 });

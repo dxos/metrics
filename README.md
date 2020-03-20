@@ -49,7 +49,7 @@ metrics.inc('counter');
 metrics.inc('counter');
 metrics.inc('counter');
 
-expect(metrics.stats['counter']).toEqual(metrics.filter({ key: 'counter' }).length);
+expect(metrics.get('counter').toEqual(metrics.filter({ key: 'counter' }).length);
 ```
 
 ### Time Series
