@@ -22,6 +22,7 @@ export class Metrics {
   static TYPE_INC = 'inc';
   static TYPE_DEC = 'dec';
   static TYPE_SET = 'set';
+  static TYPE_DELETE = 'delete';
   static TYPE_PERIOD = 'period';
 
   // Map of listeners indexed by subscription object. */
@@ -150,6 +151,14 @@ export class Metrics {
   }
 
   /**
+   * Deletes the given key.
+   * @param {string} key
+   */
+  delete (key) {
+    this._log({ type: Metrics.TYPE_DELETE, source: this._name, key, ts: Date.now() });
+  }
+
+  /**
    * Creates a named timer.
    * @param {string} key
    * @param {Object} [customStart] Custom attributes for event.
@@ -193,6 +202,11 @@ export class Metrics {
         break;
       }
 
+      case Metrics.TYPE_DELETE: {
+        this._properties.delete(key);
+        break;
+      }
+
       case Metrics.TYPE_PERIOD: {
         const { ts, period, custom } = metric;
         this._properties.push(key, { ts, period, ...custom && { custom } });
@@ -213,12 +227,12 @@ export class Metrics {
 
 const root = new Metrics();
 
-const f = (...args) => root.extend(...args);
+const metrics = (...args) => root.extend(...args);
 
 // Clone the root object.
-Object.setPrototypeOf(f, Object.getPrototypeOf(root));
+Object.setPrototypeOf(metrics, Object.getPrototypeOf(root));
 Object.getOwnPropertyNames(root).forEach(key =>
-  Object.defineProperty(f, key, Object.getOwnPropertyDescriptor(root, key))
+  Object.defineProperty(metrics, key, Object.getOwnPropertyDescriptor(root, key))
 );
 
-export default f;
+export default metrics;

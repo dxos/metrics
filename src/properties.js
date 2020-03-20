@@ -4,6 +4,7 @@
 
 import get from 'lodash.get';
 import set from 'lodash.set';
+import unset from 'lodash.unset';
 
 /**
  * Settable properties.
@@ -37,7 +38,15 @@ export class Properties {
   }
 
   set (key, value) {
-    set(this._properties, key, value);
+    if (value === undefined) {
+      this.delete(key);
+    } else {
+      set(this._properties, key, value);
+    }
+  }
+
+  delete (key) {
+    unset(this._properties, key);
   }
 
   push (key, value) {

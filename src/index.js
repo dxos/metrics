@@ -2,5 +2,13 @@
 // Copyright 2020 Wireline, Inc.
 //
 
-export * from './metrics';
-export * from './properties';
+import metrics, { Metrics } from './metrics';
+import { Properties } from './properties';
+
+export {
+  metrics,
+  Metrics,
+  Properties
+};
+
+export default metrics;

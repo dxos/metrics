@@ -1,6 +1,6 @@
 {
   "name": "@dxos/metrics",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.4",
   "description": "Non-intrusive metrics gathering.",
   "files": [
     "dist"
@@ -36,7 +36,8 @@
     "lodash.filter": "^4.6.0",
     "lodash.get": "^4.4.2",
     "lodash.matches": "^4.6.0",
-    "lodash.set": "^4.3.2"
+    "lodash.set": "^4.3.2",
+    "lodash.unset": "^4.5.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
