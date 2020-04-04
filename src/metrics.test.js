@@ -18,7 +18,28 @@ class Demo {
   }
 }
 
+test('Subscriptions', async (done) => {
+  metrics.reset();
+  const m = metrics('test');
+
+  let count = 0;
+  const off = m.on(null, ({ key }) => {
+    expect(key).toBe('test-1');
+    count++;
+    if (count === 3) {
+      off();
+      expect(m._listeners.size).toBe(0);
+      done();
+    }
+  });
+
+  m.inc('test-1');
+  m.inc('test-1');
+  m.inc('test-1');
+});
+
 test('Basics', async () => {
+  metrics.reset();
   const m = metrics('test');
 
   let count = 0;
@@ -51,9 +72,12 @@ test('Basics', async () => {
   expect(metrics.filter({ type: Metrics.TYPE_PERIOD })).toHaveLength(count);
 
   off();
+
+  expect(metrics._listeners.size).toBe(0);
 });
 
 test('Counters', async () => {
+  metrics.reset();
   const m = metrics('test');
 
   m.inc('foo');
@@ -64,6 +88,7 @@ test('Counters', async () => {
 });
 
 test('Values', async () => {
+  metrics.reset();
   const m = metrics('test');
 
   m.set('foo', 100);
@@ -74,6 +99,7 @@ test('Values', async () => {
 });
 
 test('Time-series', async () => {
+  metrics.reset();
   const m = metrics('test');
 
   const work = async (i) => {

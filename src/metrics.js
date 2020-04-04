@@ -25,7 +25,10 @@ export class Metrics {
   static TYPE_DELETE = 'delete';
   static TYPE_PERIOD = 'period';
 
-  // Map of listeners indexed by subscription object. */
+  /**
+   * Map of listeners indexed by subscription object.
+   * @type {Map<Number, { match, handler }>}
+   */
   _listeners = new Map();
 
   /** type {Metrics[]} */
@@ -34,14 +37,17 @@ export class Metrics {
   /** type {{ type, source, key }[]} */
   _metrics = [];
 
-  constructor (name, parent) {
-    this._name = name;
+  _properties = new Properties();
+
+  constructor (name, parent = root) {
+    assert(name);
+    this._name = typename(name);
     this._parent = parent;
-    this._properties = new Properties();
   }
 
   reset () {
-    this._metrics = [];
+    // Keep existing object (due to reference).
+    this._metrics.length = 0;
     this._properties.clear();
   }
 
@@ -101,20 +107,21 @@ export class Metrics {
    * @returns {function} Unregisters the handler.
    */
   on (match, handler) {
-    this._listeners.set(match, handler);
-    return () => this.off(match);
+    const handle = Math.random();
+    this._listeners.set(handle, { match, handler });
+    return () => this.off(handle);
   }
 
   /**
    * Removes this listener.
-   * @param {object} match
+   * @param {Number} handle
    */
-  off (match) {
-    this._listeners.delete(match);
+  off (handle) {
+    this._listeners.delete(handle);
   }
 
   _fireListeners (metric) {
-    this._listeners.forEach((handler, filter) => {
+    this._listeners.forEach(({ handler, filter }) => {
       if (matches(filter)(metric)) {
         handler(metric);
       }
@@ -225,14 +232,21 @@ export class Metrics {
   }
 }
 
-const root = new Metrics();
+const root = new Metrics('__ROOT__', null);
 
-const metrics = (...args) => root.extend(...args);
+/**
+ * Metrics factory.
+ * @param args
+ * @returns {Metrics}
+ */
+function metrics (...args) {
+  return new Metrics(...args);
+}
 
-// Clone the root object.
+// Clone the root object's properties.
 Object.setPrototypeOf(metrics, Object.getPrototypeOf(root));
-Object.getOwnPropertyNames(root).forEach(key =>
-  Object.defineProperty(metrics, key, Object.getOwnPropertyDescriptor(root, key))
-);
+Object.getOwnPropertyNames(root).forEach(key => {
+  Object.defineProperty(metrics, key, Object.getOwnPropertyDescriptor(root, key));
+});
 
 export default metrics;
