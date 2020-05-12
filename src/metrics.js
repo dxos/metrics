@@ -198,6 +198,10 @@ export class Metrics {
     };
   }
 
+  /**
+   * Logs an event.
+   * @param {string} key 
+   */
   event (key) {
     this._log({ type: Metrics.TYPE_EVENT, source: this._name, key, ts: Date.now() });
   }
