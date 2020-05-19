@@ -116,3 +116,18 @@ test('Time-series', async () => {
 
   expect(m.values.work[0].period).not.toBe(0);
 });
+
+test('Events', async () => {
+  metrics.reset();
+  const m = metrics('test');
+
+  m.event('foo');
+  m.event('bar');
+
+  expect(m.values).toEqual({});
+  expect(m.events.length).toEqual(2);
+  expect(m.events[0].key).toEqual('foo');
+  expect(m.events[0].time).toBeLessThan(100);
+  expect(m.events[1].key).toEqual('bar');
+  expect(m.events[1].time).toBeLessThan(100);
+});

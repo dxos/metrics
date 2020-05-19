@@ -24,6 +24,7 @@ export class Metrics {
   static TYPE_SET = 'set';
   static TYPE_DELETE = 'delete';
   static TYPE_PERIOD = 'period';
+  static TYPE_EVENT = 'event';
 
   /**
    * Map of listeners indexed by subscription object.
@@ -38,6 +39,10 @@ export class Metrics {
   _metrics = [];
 
   _properties = new Properties();
+
+  _events = [];
+
+  _startTs = Date.now();
 
   constructor (name, parent = root) {
     assert(name);
@@ -82,6 +87,10 @@ export class Metrics {
 
   get values () {
     return this._properties.values;
+  }
+
+  get events () {
+    return this._events;
   }
 
   get (key) {
@@ -189,6 +198,14 @@ export class Metrics {
     };
   }
 
+  /**
+   * Logs an event.
+   * @param {string} key
+   */
+  event (key) {
+    this._log({ type: Metrics.TYPE_EVENT, source: this._name, key, ts: Date.now() });
+  }
+
   _log (metric) {
     this._metrics.push(metric);
 
@@ -217,6 +234,11 @@ export class Metrics {
       case Metrics.TYPE_PERIOD: {
         const { ts, period, custom } = metric;
         this._properties.push(key, { ts, period, ...custom && { custom } });
+        break;
+      }
+
+      case Metrics.TYPE_EVENT: {
+        this._events.push({ key, time: metric.ts - this._startTs });
         break;
       }
 
