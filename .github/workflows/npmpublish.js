@@ -25,6 +25,7 @@ jobs:
           git config --global user.email "npm@dxos.network"
           git config --global user.name "DxOS"
           yarn
+          yarn test
           yarn version --prerelease
           yarn build
           yarn publish --tag beta --access public
