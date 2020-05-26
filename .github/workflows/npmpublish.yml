@@ -26,7 +26,7 @@ jobs:
           git config --global user.name "DxOS"
           yarn
           yarn test
-          yarn version --prerelease
+          yarn version --new-version `yarn --json info $(jq -r .name package.json) dist-tags.$TAG | jq -r '.data' | awk -F"." '{for (i=1; i<NF; i++) printf $i"."; print $NF+1}'`
           yarn build
           yarn publish --tag beta --access public
           git push --follow-tags
