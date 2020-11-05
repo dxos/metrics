@@ -22,7 +22,7 @@
     "url": "git+https://github.com/dxos/metrics.git"
   },
   "author": "",
-  "license": "GPL-3.0",
+  "license": "AGPLv3",
   "bugs": {
     "url": "https://github.com/dxos/metrics/issues"
   },
